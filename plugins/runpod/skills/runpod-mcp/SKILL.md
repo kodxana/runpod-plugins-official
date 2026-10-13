@@ -92,9 +92,8 @@ For concepts (pods vs serverless, GPU selection, storage), read `../runpod-usage
 
 ## Use MCP vs runpodctl
 
-- **Use runpod-mcp** when the tools are connected AND the task is infra CRUD,
-  browsing/deploying an existing Hub listing, or a serverless job call the server
-  exposes. Cap large job/log output to a file.
+- **Use this lane** when the tools are connected AND the task is infra CRUD or a
+  serverless job call the server exposes. Cap large job/log output to a file.
 - **Use runpodctl instead** for: **`send`/`receive`** file transfer, **SSH** key
   management, **`doctor`** setup, **model cache**, or any shell-only agent, or
   when the user wants a reproducible command.

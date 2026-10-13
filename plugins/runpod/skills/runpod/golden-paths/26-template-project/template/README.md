@@ -16,7 +16,10 @@ is the queue adapter; `requirements.txt` pins the worker SDK; `test_app.py` chec
 useful results and failure recovery; `test_input.json` is a local SDK request fixture.
 `Dockerfile.http` serves Pods or load balancing;
 `Dockerfile.queue` starts the queue worker. `.dockerignore` excludes local/secret data.
-The separate `pytorch/` directory is an optional GPU/layer probe with its own context.
+The separate `pytorch/` directory is a long-lived Pod fixture with its own context:
+it keeps the official base's `/start.sh` and runs the optional GPU/layer probe only
+when explicitly invoked. See the [PyTorch variant](../variant-pytorch.md) for its
+startup, repeated-report and cleanup instructions.
 
 Run these commands **from this directory**, in Bash or PowerShell (single-line syntax):
 

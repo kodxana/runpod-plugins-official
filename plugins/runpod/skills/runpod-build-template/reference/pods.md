@@ -12,8 +12,12 @@ actual base entrypoint before overriding it; hook names and ordering can differ.
 Keep required foreground processes alive; use `exec` for a single application or
 deliberate supervision for multiple required services. Surface failed child processes
 and forward shutdown signals. A fixed sleep does not prove another service is ready.
-For batch workloads, successful completion/outputs are the signal; an exited process
-is not automatically a failure or proof that billing stopped.
+For a development Pod, retain the base's long-running command and run finite checks
+through `exec`/SSH or a supported startup hook. A check as the container's only command
+can finish and trigger repeated container restarts. Make repeated checks safe with
+existing output files. For a batch-only Pod, define who stops or terminates it after
+completion and preserves its results; process exit alone does not establish that
+the Pod stopped or billing ended.
 
 For network services bind the intended interface (usually `0.0.0.0`) and align app,
 container and Runpod ports. Expose only required services and configure access controls

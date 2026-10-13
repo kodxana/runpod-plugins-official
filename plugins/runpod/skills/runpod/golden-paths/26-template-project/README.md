@@ -27,6 +27,13 @@ Local verification on **2026-10-06** used Docker **29.7.2**, Linux **x86_64** in
 | Queue final image / SDK 1.10.1 local-input mode | Expected `words=3`, counts `a=2,b=1` returned; empty text surfaced ValueError and exited nonzero. |
 | Runpod Pod/queue/LB, managed GitHub route, GPU/layers/retained workspace | Unverified; no cloud deployment or GPU test performed. |
 
+On **2026-10-13**, five PyTorch report/retry tests passed with a torch double, and
+Docker **29.7.2** / Python **3.12.3** on WSL Ubuntu passed the small mock-base
+lifecycle check. Its service remained usable after restarting the same container,
+with prior workspace files intact. A successful one-shot command used as a negative
+control entered a restart loop and failed this check. These are local regression
+results, not evidence of CUDA, official-base services or Runpod acceptance.
+
 The queue build encountered one package-download timeout; one unchanged retry succeeded.
 That was a transport failure, not evidence of a dependency incompatibility. These local
 results validate this CPU fixture only, not the user's future application.
@@ -82,12 +89,16 @@ readiness/errors and concurrent request isolation. Container `test` stages exerc
 the same checks on each image's runtime. The variants then test the actual default
 entrypoint and, when authorized, the selected external Runpod interface.
 
+The [PyTorch variant](variant-pytorch.md#verify) adds a regression check for Pod
+lifecycle/restart against a small mock base and report tests with a torch double.
+These run in CI without CUDA or Runpod access; GPU behavior needs the real probe.
+
 ## Gotchas
 
 - Explicit authoring does not become a prebuilt deployment merely because one exists.
 - Hosted-build limits and source-access boundaries can change the build route.
 - An image build, local HTTP 200, or CPU matrix operation is not a Runpod GPU pass.
-- Existing golden-path commands are historical examples; confirm current live syntax.
+- Preserve each golden path's stated verification status; confirm current command syntax.
 
 ## Cost & cleanup
 

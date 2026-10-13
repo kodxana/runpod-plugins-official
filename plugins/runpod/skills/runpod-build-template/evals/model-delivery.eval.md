@@ -28,8 +28,9 @@ and offline/preloaded-only constraints intact.
 
 - No separate-base assumption from model size or training ancestry alone; sizes include
   required components and are not reported as VRAM needs.
-- Provider caching and app MODEL_ID are distinct settings. An adapter/base hybrid
-  observes the current endpoint cache limit, with no invented multi-cache support.
+- The endpoint's selected cache and actual loader are checked together; no unverified
+  claim about whether changing MODEL_NAME updates the Model field. An adapter/base
+  hybrid observes the current endpoint cache limit, with no invented multi-cache support.
 - Custom loaders consume matching local artifacts for all required components through
   supported cache-directory or local-path interfaces; a path glob, global offline flag
   or baked default does not defeat the selected model.

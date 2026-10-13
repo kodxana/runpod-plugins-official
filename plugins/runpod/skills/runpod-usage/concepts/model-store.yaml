@@ -99,16 +99,6 @@ rules:
     status: documented
     see: [model-store.attach-by-reference]
     evidence:
+      - { source: public-docs, url: "https://docs.runpod.io/serverless/endpoints/model-caching", seen: "2026-10-13" }
+      - { source: public-docs, url: "https://docs.runpod.io/serverless/development/huggingface-models", seen: "2026-10-13" }
       - { source: skill, path: plugins/runpod/skills/runpod-build-template/reference/model-delivery.md, note: Connect configuration to the loader. }
-      - { source: skill, path: plugins/runpod/skills/runpodctl/reference/model-caching.md, note: HF model cache and runtime-load path. }
-
-  - id: model-store.endpoint-and-loader-selection
-    statement: >
-      Changing an application model environment variable does not update the
-      endpoint's Model field. Keep the endpoint cache selection and loader
-      selection in agreement, or implement an authorized download fallback;
-      enable offline loading only after every required component is present.
-    status: documented
-    evidence:
-      - { source: skill, path: plugins/runpod/skills/runpod-build-template/reference/model-delivery.md, note: Connect configuration to the loader. }
-      - { source: skill, path: plugins/runpod/skills/runpodctl/reference/model-caching.md, note: Runtime-load path. }

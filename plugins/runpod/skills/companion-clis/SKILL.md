@@ -32,7 +32,7 @@ download, cache, or bake that artifact.
 | `docker` | Build/validate/push images to Docker Hub for Runpod to pull | [reference/docker.md](reference/docker.md) |
 | `aws` (S3) | Read/write network-volume storage over Runpod's S3 API | [reference/aws.md](reference/aws.md) |
 
-Check credentials for the selected operation; local builds and public reads may not need them. Read the per-tool reference for auth steps and commands; install is a separate one-time `<cli>-setup.md`.
+Each requires credentials before use. Read the per-tool reference for auth steps and commands; install is a separate one-time `<cli>-setup.md`.
 
 These CLIs are usually one step inside a larger job. For the whole job the verified example is
 in [runpod/golden-paths/README.md](../runpod/golden-paths/README.md) — baking vs mounting a
@@ -45,13 +45,15 @@ for flags and subcommands** — the references here cover the Runpod-specific us
 traps, not the tool's full surface. Check `--help` before reporting that one of them cannot do
 something.
 
-## Windows: choose the environment for the operation
+## Windows: Install WSL2 First
 
-Identify native PowerShell, WSL, and the Docker engine separately. File authoring,
-native CLIs and hosted builds do not require installing WSL. For local Linux-container
-builds inspect the available engine/context, then follow the current
-[Docker setup](reference/docker-setup.md) for that route. Give shell-correct commands;
-request administrator/reboot steps only when the chosen setup actually needs them.
+If you are on Windows, install WSL2 before proceeding — it gives you the native Linux environment all these CLIs target. In PowerShell as Administrator, then restart:
+
+```powershell
+wsl --install
+```
+
+Afterward open the Ubuntu app to finish setup, then follow the **Linux** instructions in each reference.
 
 ## HuggingFace CLI
 

@@ -5,5 +5,7 @@ ENV PYTHONUNBUFFERED=1
 WORKDIR /opt/template-probe
 # PyTorch stays in the base; no reinstall or virtualenv copy to /workspace.
 COPY verify.py ./
-# This is a GPU batch/probe Pod. It does not promise SSH or Jupyter.
-CMD ["python", "verify.py", "--device", "cuda", "--output", "/workspace/probe.json"]
+# Retain the selected Runpod base's service initialization and long-lived command.
+# Run the finite probe explicitly with docker exec / SSH after startup; a Pod's
+# default command must not exit after the check and enter a restart loop.
+CMD ["/start.sh"]
