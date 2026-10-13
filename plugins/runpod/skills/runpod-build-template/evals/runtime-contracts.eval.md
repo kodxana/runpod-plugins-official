@@ -15,6 +15,10 @@ request data and bounded concurrency. Required outputs survive worker replacemen
 ## Assertions
 
 - Pod does not acquire unwanted SSH/Jupyter; promised interfaces remain working.
+- A development Pod keeps its base startup process running after a finite check;
+  repeat the check and restart with existing reports without a crash loop or lost data.
+- A batch-only Pod has an explicit result-retention and stop/terminate plan; successful
+  process exit alone is not evidence that billing stopped.
 - Queue starts the real SDK handler and surfaces failures; it is not an HTTP mock.
 - LB keeps routes and current health/port contract, without a queue adapter.
 - Invalid request followed by valid request succeeds; repeated work does not accumulate

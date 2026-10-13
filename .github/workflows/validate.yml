@@ -153,6 +153,23 @@ jobs:
         if: always() && matrix.target == 'http'
         run: docker rm -f template-http || true
 
+  pytorch-pod-lifecycle:
+    # Mock torch and a small base service: no CUDA image, GPU or Runpod resources.
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: plugins/runpod/skills/runpod/golden-paths/26-template-project/template/pytorch
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Check repeated reports and explicit failures with a torch double
+        run: python3 -B -m unittest -v test_verify
+      - name: Exercise the default Pod command and restart with retained storage
+        run: python3 -B check_lifecycle.py
+
   nix-checks:
     # Runs the full static-analysis gate (ruff, mypy, bandit, unittest,
     # shellcheck, shfmt, biome, nixfmt, deadnix, statix) hermetically. The

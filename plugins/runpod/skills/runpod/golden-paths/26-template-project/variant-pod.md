@@ -57,7 +57,7 @@ and the changed image against old user state. This stateless fixture cannot prov
 
 `EXPOSE` is documentation; the Pod configuration must expose the actual app port.
 Binding only `localhost` would break external access. Do not add SSH just to conform
-to the historical [SSH-enabled example](../22-minimal-pod-image/README.md).
+to the [SSH-enabled example](../22-minimal-pod-image/README.md).
 
 ## Cost & cleanup
 

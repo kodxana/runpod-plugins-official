@@ -54,10 +54,12 @@ in designated writable storage and coordinate shared downloads with integrity ch
 and atomic completion. Enforce offline loading only after required downloads finish;
 a global offline flag must not silently disable an intended fallback.
 
-Changing an application environment variable does not update the endpoint Model field.
-Explain when users must update that field as well, or when an allowed volume-download
-fallback makes the application variable sufficient. Keep the Hub form, image default,
-runtime behavior and README consistent when those surfaces are in scope.
+Read back the endpoint's selected model/cache status and compare it with the model
+the application actually loads. Verify the selected deployment route's handling of
+the Model field and model environment variables instead of assuming how they update
+each other. Document any required configuration changes or allowed download fallback.
+Keep the Hub form, image default, runtime behavior and README consistent when those
+surfaces are in scope.
 
 ## Verify the selected paths
 
