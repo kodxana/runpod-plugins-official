@@ -8,7 +8,7 @@ description: >-
   and companion-clis for standalone image build/push commands.
 metadata:
   author: runpod
-  version: "1.7.1" # x-release-please-version
+  version: "1.7.2" # x-release-please-version
   concepts: [container-image, template, pod, serverless-endpoint, serverless-handler, endpoint-build, hub-repo, model-store, network-volume]
 license: Apache-2.0
 ---

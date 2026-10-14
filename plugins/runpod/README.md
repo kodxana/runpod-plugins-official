@@ -4,7 +4,7 @@ One entrypoint for AI agents to manage GPU workloads on Runpod — pods, serverl
 endpoints, jobs, templates, and volumes — via the Runpod MCP server, `runpodctl`,
 and `flash`, with conceptual guidance and worked golden paths.
 
-This plugin bundles a router, specialized lanes and MCP journey skills, the hosted Runpod MCP server config
+This plugin bundles its skills (a router, the lanes it routes to, and the MCP journey skills), the hosted Runpod MCP server config
 ([`.mcp.json`](.mcp.json)), and reference material.
 
 ## Which skill?
@@ -23,6 +23,7 @@ lane below. If you already know the lane, go straight to it.
 | [`runpod-templates`](skills/runpod-templates/SKILL.md) | **Official pod templates** — what each image ships, ports/paths, readiness/runtime gotchas, version pinning; ComfyUI, PyTorch, Ubuntu. |
 | [`runpod-build-template`](skills/runpod-build-template/SKILL.md) | **Create or improve a complete template project** — documented Dockerfile, app-specific files and a precise deployment handoff. |
 | [`runpod-migrate`](skills/runpod-migrate/SKILL.md) | **Migrate code** from the GraphQL API or REST v1 to REST v2 — inventory, rewrite, flag breaking changes. |
+| [`discovery`](skills/discovery/SKILL.md), [`lifecycle-crud`](skills/lifecycle-crud/SKILL.md), [`serverless-deploy`](skills/serverless-deploy/SKILL.md), [`pod-deploy`](skills/pod-deploy/SKILL.md), [`pod-doctor`](skills/pod-doctor/SKILL.md), [`endpoint-ops`](skills/endpoint-ops/SKILL.md), [`cost-audit`](skills/cost-audit/SKILL.md) | **MCP journeys** — the step-by-step playbooks `runpod-mcp` routes to for work done with the MCP tools. |
 
 The migration flow also has a slash command: **`/runpod:migrate [scope] [path]`**
 runs the `runpod-migrate` workflow directly, e.g. `/runpod:migrate rest src/`.

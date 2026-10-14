@@ -10,7 +10,7 @@ allowed-tools: Bash(runpodctl:*)
 compatibility: Linux, macOS
 metadata:
   author: runpod
-  version: "1.7.1" # x-release-please-version
+  version: "1.7.2" # x-release-please-version
   concepts: [runpodctl, pod, cpu-pod, serverless-endpoint, template, network-volume, hub-repo, ssh-key, file-transfer, model-store]
 license: Apache-2.0
 ---
@@ -144,7 +144,8 @@ commands, `project`), and the env-var table (incl. `RUNPOD_INVOKE_URL`):
 - For SSH, use `runpodctl pod get <pod-id>` or `runpodctl ssh info <pod-id>` to retrieve connection details. runpodctl has **no interactive-shell command** — `ssh info` returns the connection command + key but does not connect. Run commands over SSH yourself with `ssh user@host "command"`.
 - Network volumes are location-sensitive. Check datacenter availability before attaching volumes, and use `send` / `receive` or S3-compatible storage for migrations.
 - Clean up paid resources after tests: delete serverless endpoints, pods, and temporary volumes created for validation.
-  - **Cost guard on creation:** use `--terminate-after` (deletes the pod); `--stop-after` only *stops* it, so disk/volume keep billing.
+  - **Cost guard:** remove the pod when the work is done (`runpodctl pod remove <pod-id>`). For an unattended deadline, schedule a stop from inside the pod: Runpod pods ship `runpodctl` and a pod-scoped API key ([Manage Pods](https://docs.runpod.io/pods/manage-pods)). A stopped pod still bills for disk and any volume.
+  - **`--stop-after` / `--terminate-after` never worked.** runpodctl before v2.12.0 accepts both `pod create` flags, but the backend never enforced them, so the pod keeps running and billing past the deadline. v2.12.0 removed them. If `runpodctl pod create --help` still lists them, run `runpodctl update`. Never offer them as a cost guard.
   - **Attached volume:** to delete a network volume, remove the pod using it first.
 
 ### Serverless facts (context, not rules)
@@ -330,7 +331,7 @@ are **pod on-demand** rates. Shape, stock-value vocabulary and the `"none"` vs
 omitted-key sentinel:
 [reference/output-and-errors.md](reference/output-and-errors.md#gpu-pricing-and-per-data-center-availability).
 
-`ssh info` gives connection details, not a session — if interactive SSH isn't available, run `ssh user@host "command"`. **Registry auth, `billing` history, and SSH key management** (`ssh add-key`/`remove-key`) are in [reference/command-reference.md](reference/command-reference.md).
+`ssh info` gives connection details, not a session — if interactive SSH isn't available, run `ssh user@host "command"`. **Registry auth, `billing` history, and SSH key management** (`ssh add-key`/`remove-key`) are in [reference/command-reference.md](reference/command-reference.md). `ssh info` leaves host key verification to the OpenSSH client you run against its output. The host key pinning that the deprecated `project`/`exec python` paths use (v2.15.0+), and why `ssh forget` must wait for the operator's go-ahead, is in [reference/command-reference.md](reference/command-reference.md#pod-host-key-trust-v2150).
 
 ### File Transfer
 
