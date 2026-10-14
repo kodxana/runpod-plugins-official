@@ -42,3 +42,6 @@ for this request.
 4. **MCP lacks the requested Hub operation.** Verifies that against the live tool
    surface and hands that operation to runpodctl; does not extrapolate an absent
    operation into a claim that all Hub tasks require the CLI.
+5. **Endpoint workflow guide opened first.** Follows its link to the router's
+   capability matrix. The guide's CLI deployment example does not override a
+   connected MCP operation or require CLI setup for an MCP-capable Hub task.
