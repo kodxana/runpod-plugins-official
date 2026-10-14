@@ -13,7 +13,7 @@ CMD ["python3", "app.py"]
 
 # Tests exercise the same runtime; the final application contains no test code.
 FROM runtime AS test
-COPY handler.py test_app.py ./
+COPY handler.py check_http.py test_app.py ./
 CMD ["python3", "-m", "unittest", "-v", "test_app"]
 
 FROM runtime AS app
