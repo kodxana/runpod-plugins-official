@@ -23,9 +23,12 @@ offline or preloaded-only requirement, including a requested builder stress test
 
 For Serverless, consult [cached-model documentation](https://docs.runpod.io/serverless/endpoints/model-caching)
 and the [official custom-worker example](https://github.com/runpod-workers/model-store-cache-example).
-Checked **2026-10-10**: caching can be configured for Docker, GitHub and Hub deployments;
+Checked **2026-10-14**: caching can be configured for Docker, GitHub and Hub deployments;
 custom workers must integrate the cache into their loaders, and the documented limit
-is one cached model per endpoint. Recheck current constraints before deployment.
+is one cached model per endpoint. When a repository contains multiple quantization
+variants, Model Store downloads all of them: budget storage and cache-miss startup
+time for the full repository, even if the loader selects only one variant.
+Recheck current constraints before deployment.
 An adapter plus separate base may need a hybrid plan, with a location for each component.
 Do not substitute the adapter ID for the required base, or assume caching one includes both.
 The endpoint Model field is distinct from the uploaded Model Repository feature; see

@@ -130,6 +130,17 @@ rules:
       - { source: public-docs, url: "https://docs.runpod.io/serverless/workers/github-integration", seen: "2026-10-10" }
       - { source: skill, path: plugins/runpod/skills/runpod-build-template/reference/github-integration.md, note: Documented behavior table. }
 
+  - id: endpoint-build.github-console-rollback
+    statement: >
+      An endpoint deployed through GitHub integration can roll back to a
+      previous build from the console's Builds tab without a new GitHub release.
+      A previous build must exist in deployment history; deploying a later
+      GitHub release supersedes the rollback.
+    status: documented
+    see: [endpoint-build.github-update-trigger]
+    evidence:
+      - { source: public-docs, url: "https://docs.runpod.io/serverless/workers/github-integration", seen: "2026-10-14", note: Roll back to a previous build. }
+
   - id: endpoint-build.github-account-connection
     statement: >
       A Runpod account supports one GitHub connection, and connections are not

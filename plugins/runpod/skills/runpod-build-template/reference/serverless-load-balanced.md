@@ -9,10 +9,16 @@ streaming behavior; a queue handler is not required. Verify the current
 [worker contract](https://docs.runpod.io/serverless/load-balancing/build-a-worker)
 before setting health ports, readiness status codes, timeouts, or routing settings.
 
-Bind the intended interface, align the server's port with platform configuration,
-and implement the required health route. Separate process liveness from application
-readiness: downloading/loading a required model must not report ready. A health
-response alone still does not prove a real request works.
+Bind to `0.0.0.0` and read `PORT` from the environment. Runpod defaults `PORT` to
+`80`; `PORT_HEALTH` defaults to the same port and `HEALTH_CHECK_PATH` to `/ping`.
+For a custom port, align the application, endpoint environment, and exposed-port
+configuration. A Docker-local port is not the platform default.
+
+The health route must return **204 while initializing/loading the model**, then
+**200 when ready**; other codes mean unhealthy. Keep serving the initializing
+response until the real workload can run. These are the documented
+[health-check semantics](https://docs.runpod.io/serverless/load-balancing/overview#health-checks).
+A health response alone still does not prove a real request works.
 
 Load reusable models once per worker process. Multiple web processes may each load
 another model copy; size them deliberately. Match HTTP concurrency to safe model/GPU
