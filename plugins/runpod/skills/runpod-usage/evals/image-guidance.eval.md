@@ -18,6 +18,11 @@ the startup and speed up rebuilds? I use Windows and Docker may already be in WS
   digest, and distinguish build cache reuse from deployment-host layer residency.
 - Inspect existing native/WSL/remote Docker and its daemon before installation.
   If selecting a missing WSL2 setup, retain the `wsl --install` route.
+- For a new Windows installation, install and launch Docker Desktop before enabling
+  distribution integration and checking `docker info` in that distribution.
+- For local Linux Docker Engine permission errors, explain the optional `docker`
+  group command, its root-level privileges, and logging out and back in before
+  verifying access. Do not apply host installation steps to a Runpod pod.
 
 ## Additional prompts
 
