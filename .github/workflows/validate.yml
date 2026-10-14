@@ -6,6 +6,34 @@ on:
     branches: [main]
 
 jobs:
+  example-changes:
+    # Keep the repository checks unconditional; only image jobs need this filter.
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      changed: ${{ steps.paths.outputs.changed }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Check whether the example images or their CI changed
+        id: paths
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: |
+          python3 - <<'PY'
+          import os
+          import subprocess
+
+          base = os.environ['BASE_SHA']
+          command = ['git', 'diff', '--name-only', base, 'HEAD'] if base and set(base) != {'0'} else ['git', 'ls-files']
+          paths = subprocess.check_output(command, text=True).splitlines()
+          changed = any(path == '.github/workflows/validate.yml' or path.startswith(
+              'plugins/runpod/skills/runpod/golden-paths/26-template-project/template/') for path in paths)
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as output:
+              output.write(f'changed={str(changed).lower()}\n')
+          PY
+
   validate:
     runs-on: ubuntu-latest
     steps:
@@ -86,6 +114,8 @@ jobs:
 
   template-examples:
     # Small CPU fixtures only: no Runpod credentials, GPU, push or billable resources.
+    needs: example-changes
+    if: needs.example-changes.outputs.changed == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     strategy:
@@ -105,27 +135,9 @@ jobs:
         if: matrix.target == 'http'
         run: |
           docker run -d --name template-http -p 127.0.0.1:8080:8080 template-example:app
-          python3 - <<'PY'
-          import json
-          import time
-          from urllib.error import URLError
-          from urllib.request import Request, urlopen
-
-          for attempt in range(30):
-              try:
-                  with urlopen('http://127.0.0.1:8080/ping', timeout=2) as response:
-                      assert json.load(response) == {'status': 'ready'}
-                  break
-              except URLError:
-                  if attempt == 29:
-                      raise
-                  time.sleep(1)
-          request = Request('http://127.0.0.1:8080/analyze',
-                            data=b'{"text":"A a B"}',
-                            headers={'Content-Type': 'application/json'})
-          with urlopen(request, timeout=5) as response:
-              assert json.load(response) == {'words': 3, 'counts': {'a': 2, 'b': 1}}
-          PY
+          python3 -B check_http.py
+          docker stop --time 5 template-http
+          test "$(docker inspect --format '{{.State.ExitCode}}' template-http)" = 0
       - name: Exercise queue SDK local-input mode
         if: matrix.target == 'queue'
         run: |
@@ -155,6 +167,8 @@ jobs:
 
   pytorch-pod-lifecycle:
     # Mock torch and a small base service: no CUDA image, GPU or Runpod resources.
+    needs: example-changes
+    if: needs.example-changes.outputs.changed == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     defaults:

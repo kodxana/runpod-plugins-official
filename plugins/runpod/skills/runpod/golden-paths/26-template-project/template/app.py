@@ -2,7 +2,10 @@
 
 import json
 import os
+import signal
+import threading
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from urllib.parse import urlsplit
 
 from workload import analyze
 
@@ -17,13 +20,13 @@ class Handler(BaseHTTPRequestHandler):
         self.wfile.write(body)
 
     def do_GET(self):
-        if self.path == "/ping":
+        if urlsplit(self.path).path == "/ping":
             self.reply(200, {"status": "ready"})
         else:
             self.reply(404, {"error": "use POST /analyze"})
 
     def do_POST(self):
-        if self.path != "/analyze":
+        if urlsplit(self.path).path != "/analyze":
             self.reply(404, {"error": "route not found"})
             return
         try:
@@ -35,7 +38,7 @@ class Handler(BaseHTTPRequestHandler):
             if len(body) != length:
                 raise ValueError("incomplete request body")
             result = analyze(json.loads(body))
-        except (ValueError, UnicodeError, TimeoutError) as exc:
+        except (ValueError, UnicodeError, TimeoutError, RecursionError) as exc:
             self.reply(400, {"error": str(exc)})
             return
         self.reply(200, result)
@@ -43,6 +46,13 @@ class Handler(BaseHTTPRequestHandler):
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", "8080"))
-    server = ThreadingHTTPServer(("0.0.0.0", port), Handler)
-    print(f"text statistics ready on 0.0.0.0:{port}", flush=True)
-    server.serve_forever()
+    with ThreadingHTTPServer(("0.0.0.0", port), Handler) as server:
+        server.daemon_threads = False  # Wait for in-flight requests on shutdown.
+
+        def stop(signum, frame):
+            # shutdown() must run outside the serve_forever() thread.
+            threading.Thread(target=server.shutdown, daemon=True).start()
+
+        signal.signal(signal.SIGTERM, stop)
+        print(f"text statistics ready on 0.0.0.0:{server.server_port}", flush=True)
+        server.serve_forever()

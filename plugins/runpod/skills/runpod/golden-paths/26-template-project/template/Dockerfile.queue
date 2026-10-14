@@ -12,7 +12,7 @@ COPY workload.py handler.py test_input.json ./
 CMD ["python", "-u", "handler.py"]
 
 FROM runtime AS test
-COPY app.py test_app.py ./
+COPY app.py check_http.py test_app.py ./
 CMD ["python", "-m", "unittest", "-v", "test_app"]
 
 FROM runtime AS app
