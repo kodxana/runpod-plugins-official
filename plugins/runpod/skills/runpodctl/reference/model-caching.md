@@ -1,3 +1,6 @@
+---
+concepts: [model-store, network-volume, container-disk, serverless-endpoint, volume-cache]
+---
 # Getting a model to a serverless worker
 
 Four ways to make model weights available to a Runpod serverless worker. Pick by
@@ -6,8 +9,8 @@ where the weights come from, how large/private they are, and how often they chan
 | Method | How | Best when | Cold start |
 |--------|-----|-----------|-----------|
 | **Bake into image** | `COPY`/download during `docker build`, push to a registry | small/private weights; fully reproducible image | fast (in image) but bloats pulls |
-| **HF model cache** (`--model-reference`) | point the endpoint at a HuggingFace model URL; Runpod caches it host-side | the model is already on HuggingFace (public/gated/private) | fastest — host-cached, no download billing |
-| **Network volume** | pre-load weights onto a DC-pinned volume, mount it | large weights reused across workers; you manage the files | fast once populated; volume is pinned to one data center |
+| **HF model cache** (`--model-reference`) | point the endpoint at a HuggingFace model URL; Runpod caches it host-side | the model is already on HuggingFace (public/gated/private) | fastest load once the worker runs, no download billing; worker start waits for a host that holds the model, so the whole cold request can be slower |
+| **Network volume** | pre-load weights onto a DC-pinned volume, mount it; in your own handler, copy them to local disk with `VolumeCache` | large weights reused across workers; you manage the files | fast once populated; with `VolumeCache` the load reads local disk instead of the network mount; volume is pinned to one data center |
 | **Model Repository** (`runpodctl model`) | upload your **own** artifacts to Runpod-managed, versioned storage | private/custom models not on HuggingFace, without image bloat or a DC-locked volume | managed + host-distributed |
 
 Rule of thumb: on HuggingFace → **HF cache**; your own artifact → **Model Repository**
@@ -53,7 +56,7 @@ starts across workers on one endpoint are the normal symptom, not a bug to chase
 
 | Situation | Use |
 |---|---|
-| **Latency-sensitive** — user-facing, tight SLA, or you scale into fresh regions often and can't absorb a first-request stall | **Network volume**, pre-loaded. Costs storage per month, but the weights are already there. |
+| **Latency-sensitive** — user-facing, tight SLA, or you scale into fresh regions often and can't absorb a first-request stall | **Network volume**, pre-loaded. Costs storage per month, but the weights are already there. In a handler you write, load them through `VolumeCache` ([below](#network-volume--load-from-local-disk-with-volumecache)). |
 | **Not latency-sensitive**, or the model isn't huge | **HF model cache** (`--model-reference`). Free, nothing to pre-load, and a hit is seconds. |
 | Unsure | **Test both.** This is a measurable trade, not a rule — deploy each and time the cold start on your model, in your region. |
 
@@ -104,6 +107,58 @@ region, deploy there and measure the first cold start.
 - **All quantizations get downloaded.** If a HF repo holds several (4-bit AWQ, 8-bit
   GPTQ, …), the system currently pulls them all; you can't select one yet.
 - The feature is **beta**.
+
+## Network volume — load from local disk with `VolumeCache`
+
+**Model on Hugging Face and a GPU endpoint? Try the [HF model cache](#hf-model-cache----model-reference)
+first.** It needs no volume and no handler code, and download time isn't billed. The trade:
+worker start waits until a host holds the model, so time the **whole cold request**, queue
+delay included, not just the load. Use a volume with `VolumeCache` when that wait is too long
+for your endpoint, or when the model isn't on Hugging Face.
+
+Mounting a volume and pointing the model path at `/runpod-volume/...` makes every cold
+start read the weights over the network mount. In a handler you write (a custom image or
+Flash), keep the model cache on container disk and wrap the load in `VolumeCache` from the
+Runpod Python SDK (`runpod>=1.12.0`). It keeps a mirror of that directory on the volume,
+copies the mirror onto local disk before the load (`hydrate()`), and syncs new or changed
+files back after it (`sync()`). The first worker downloads from the Hub and every later
+cold start hydrates from the mirror.
+
+```python
+import runpod
+from runpod.serverless import VolumeCache
+from transformers import AutoModelForCausalLM
+
+HF_CACHE = "/opt/hf-cache"          # container disk, not /runpod-volume
+
+with VolumeCache(dirs=[HF_CACHE]):  # hydrate before the load, sync after
+    model = AutoModelForCausalLM.from_pretrained("Qwen/Qwen2.5-7B-Instruct", cache_dir=HF_CACHE)
+
+def handler(job):
+    ...
+
+runpod.serverless.start({"handler": handler})
+```
+
+- **Your code only.** It runs where your handler wraps it. A prebuilt worker image (a
+  stock vLLM or ComfyUI worker) reads its model path from the mount as before.
+- **Best-effort hides failures.** By default any cache error is logged and swallowed and
+  the worker cold-starts normally, so a broken cache looks like a slow cold start. Use
+  `best_effort=False` while you set it up.
+- **Keep Hub access on.** It never copies symlinks, and the HF cache's `snapshots/` entries
+  are symlinks, so `from_pretrained` re-links them with a metadata call. Don't set
+  `HF_HUB_OFFLINE=1` on a cache that `VolumeCache` restores.
+- **Size the container disk for the whole local cache** plus runtime headroom: the hydrate
+  and any fallback download both write there. Set it on the template
+  (`runpodctl template create --container-disk-in-gb`, or `PodTemplate(containerDiskInGb=...)` in
+  Flash, which defaults to 64 GB).
+- **Size the volume for the mirror** (`/runpod-volume/.cache/<RUNPOD_ENDPOINT_ID>`). Large
+  files you delete or rename locally stay on the volume, so usage grows as you swap models.
+- **Populate with one worker.** Workers that cold-start together on an empty mirror each
+  download and sync a full copy back.
+
+Measure it like the rest of this page: time a cold start with and without it on your model,
+in your data center. Exact rules: [`volume-cache`](../../runpod-usage/concepts/volume-cache.yaml).
 
 ## HF model cache — `--model-reference`
 
