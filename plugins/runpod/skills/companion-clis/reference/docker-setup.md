@@ -19,14 +19,18 @@ Credentials, tagging and build/push commands are in [`docker.md`](docker.md).
 **Windows:** Download Docker Desktop from https://docs.docker.com/desktop/setup/install/windows-install/
 - For the WSL2 backend, install WSL2 first if needed (`wsl --install` in an admin PowerShell,
   then restart if prompted and finish the distribution setup)
+- Run the installer and follow the setup wizard, then launch Docker Desktop
 - Enable Docker Desktop's integration for the distribution you will use, then verify
   `docker info` in that terminal; do not assume every WSL distribution is integrated
-- Run the installer and follow the setup wizard
 
 **Linux:** See https://docs.docker.com/engine/install/ for distro-specific instructions
 
 Choose the actual distribution's documented installation steps. Inspect a downloaded
-installer before running it. Diagnose daemon permission failures without making the
-socket world-writable; Docker daemon access is privileged.
+installer before running it. If Docker Engine is running but your user gets socket
+permission errors, the optional `sudo usermod -aG docker $USER` grants access without
+`sudo` once the `docker` group exists. Log out and back in, then verify `docker info`.
+The `docker` group grants root-level privileges; do not make the socket world-writable.
+See [Docker's Linux post-installation steps](https://docs.docker.com/engine/install/linux-postinstall/)
+for group creation and alternatives.
 
 After setup, verify the Linux engine, selected context and target builder platform.
