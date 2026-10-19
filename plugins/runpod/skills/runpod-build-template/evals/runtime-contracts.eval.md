@@ -21,6 +21,9 @@ request data and bounded concurrency. Required outputs survive worker replacemen
   process exit alone is not evidence that billing stopped.
 - Queue starts the real SDK handler and surfaces failures; it is not an HTTP mock.
 - LB keeps routes and current health/port contract, without a queue adapter.
+- LB reads Runpod's `PORT` (default 80) and aligns health checks; `/ping` returns
+  204 during model loading, 200 once ready, and an unhealthy code on failure.
+- Queue input limits are 10 MB for `/run` and 20 MB for `/runsync`; large files use URLs.
 - Invalid request followed by valid request succeeds; repeated work does not accumulate
   unintended memory/temp files; web-process model duplication is considered.
 - Retry-sensitive side effects and cancellation cleanup match the actual application.

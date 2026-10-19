@@ -89,6 +89,17 @@ rules:
       - { source: public-docs, url: "https://docs.runpod.io/serverless/endpoints/model-caching", seen: "2026-10-10" }
       - { source: skill, path: plugins/runpod/skills/runpod-build-template/reference/model-delivery.md, note: Delivery choices and documented cache constraints. }
 
+  - id: model-store.all-quantization-variants
+    statement: >
+      When a Hugging Face repository contains several quantization variants,
+      Model Store downloads all of them. Account for the whole repository's
+      download size and cache-miss startup time, not just the variant the
+      application loads.
+    status: documented
+    see: [model-store.no-download-billing]
+    evidence:
+      - { source: public-docs, url: "https://docs.runpod.io/serverless/endpoints/model-caching", seen: "2026-10-14", note: Cached-model limitations. }
+
   - id: model-store.custom-loader-integration
     statement: >
       A custom worker must configure its loader's cache directory or pass the
@@ -102,3 +113,17 @@ rules:
       - { source: public-docs, url: "https://docs.runpod.io/serverless/endpoints/model-caching", seen: "2026-10-13" }
       - { source: public-docs, url: "https://docs.runpod.io/serverless/development/huggingface-models", seen: "2026-10-13" }
       - { source: skill, path: plugins/runpod/skills/runpod-build-template/reference/model-delivery.md, note: Connect configuration to the loader. }
+
+  - id: model-store.flash-attach-after-deploy
+    statement: >
+      For a Flash endpoint, attach the model after `flash deploy` with
+      `runpodctl serverless update <endpoint-id> --model-reference <url>:<ref>`,
+      which prints the saved `modelReferences`. Later `flash deploy` runs keep
+      the reference. Point `HF_HUB_CACHE` at
+      `/runpod-volume/huggingface-cache/hub` so the load finds it.
+    status: verified
+    see: [model-store.attach-by-reference, model-store.best-effort-locality]
+    evidence:
+      - { source: live-probe, ref: "runpodctl 2.14.0 serverless update --model-reference on a runpod-flash 1.20.1 endpoint, then flash deploy with a changed env; GraphQL myself.endpoints.modelReferences kept the reference", seen: "2026-10-14" }
+      - { source: public-docs, url: "https://docs.runpod.io/serverless/endpoints/model-caching", seen: "2026-10-14", note: Cached models are under /runpod-volume/huggingface-cache/hub/. }
+      - { source: skill, path: plugins/runpod/skills/runpodctl/reference/model-caching.md }

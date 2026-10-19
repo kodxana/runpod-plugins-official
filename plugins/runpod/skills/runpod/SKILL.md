@@ -131,7 +131,9 @@ An existing prebuilt does not replace the requested deliverable.
 2. **Author or improve a template project / Dockerfile**, including converting local
    code or a GitHub repository, or prepare its Hub listing files → **runpod-build-template**.
    It delegates build/push mechanics and infrastructure work to their existing lanes.
-   Browsing or deploying an existing Hub listing stays in the infrastructure lanes below.
+   Registering an already-built image as a reusable template ("make a template from
+   my image") and browsing/deploying an existing Hub listing use the infrastructure
+   lanes below; registration needs no new Dockerfile.
 3. **Run a common workload on a pod, or fix a template pod** ("run ComfyUI /
    PyTorch dev box", won't boot, missing models) → **runpod-templates** — check for
    an official prebuilt before planning any install, and let it route repairs.

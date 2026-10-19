@@ -4,7 +4,7 @@ One entrypoint for AI agents to manage GPU workloads on Runpod — pods, serverl
 endpoints, jobs, templates, and volumes — via the Runpod MCP server, `runpodctl`,
 and `flash`, with conceptual guidance and worked golden paths.
 
-This plugin bundles a router, specialized lanes and MCP journey skills, the hosted Runpod MCP server config
+This plugin bundles its skills (a router, the lanes it routes to, and the MCP journey skills), the hosted Runpod MCP server config
 ([`.mcp.json`](.mcp.json)), and reference material.
 
 ## Which skill?

@@ -8,6 +8,7 @@ cap; a build that times out in its Docker step; a total-window timeout; device-d
 build hook; monorepo/LFS/submodule assets; gated dependency; portable-image requirement;
 repository absent from the connected account; and a commit push that did not update
 an existing endpoint. Include both queue and load-balanced apps.
+Also evaluate recovery from a bad deployment with a known previous successful build.
 
 ## Expected behavior
 
@@ -27,4 +28,6 @@ source access and runtime access. A GitHub URL is not a mandate to use this buil
   assumed Docker-in-a-Pod.
 - Local Docker and a user registry are not mandatory for every eligible managed build.
 - Existing endpoint update verifies the release trigger and actual deployed identity.
+- Recovery identifies the previous build's console Rollback action, without requiring
+  image export or a new release; a later GitHub release supersedes the rollback.
 - No account disconnection, new release, push or billable resource beyond user scope.

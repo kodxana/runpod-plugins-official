@@ -28,6 +28,8 @@ and offline/preloaded-only constraints intact.
 
 - No separate-base assumption from model size or training ancestry alone; sizes include
   required components and are not reported as VRAM needs.
+- A multi-quantization repository's cache download budget includes every variant,
+  even if the loader selects only one; cache-miss startup reflects that download.
 - The endpoint's selected cache and actual loader are checked together; no unverified
   claim about whether changing MODEL_NAME updates the Model field. An adapter/base
   hybrid observes the current endpoint cache limit, with no invented multi-cache support.

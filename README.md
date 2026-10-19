@@ -4,9 +4,9 @@ The **official** plugin marketplace of skills for AI agents to manage GPU worklo
 pods, serverless endpoints, jobs, templates, and volumes — via the Runpod MCP
 server, `runpodctl`, and `flash`.
 
-This repo ships **one plugin**, [`runpod`](plugins/runpod/), with a router, specialized
-lanes and MCP journey skills, the hosted Runpod MCP server config, worked golden paths,
-and a concept graph of how Runpod works. You install and use it as a plugin, exactly as
+This repo ships **one plugin**, [`runpod`](plugins/runpod/), that bundles a router skill,
+the lane skills it routes to, the MCP journey skills, the hosted Runpod MCP server config,
+worked golden paths and a concept graph of how Runpod works. You install and use it as a plugin, exactly as
 below; the npm package described under [Also on npm](#also-on-npm) is an extra way for
 programs to read the same content.
 
@@ -52,7 +52,7 @@ That's it. Notes:
 ## Install
 
 Same repo, one manifest — pick your agent below. Every route installs the same
-router, specialized lanes and MCP journey skills, plus a hosted **Runpod MCP server** for
+skills (the router, the lanes and the MCP journey skills), plus a hosted **Runpod MCP server** for
 control-plane tools.
 Then [authenticate](#authentication).
 

@@ -21,8 +21,11 @@ and avoid accumulating output tensors or global request state. Start with conser
 concurrency; async code alone does not make a model or shared GPU safe to run concurrently.
 
 Worker-local disk/memory is disposable. Write required durable outputs to a supported
-external destination and return retrievable identifiers/URLs. Check current payload
-limits and avoid embedding large binary results in JSON. Runtime storage/auth choices
+external destination and return retrievable identifiers/URLs. Queue request payloads
+are capped at **10 MB for `/run`** and **20 MB for `/runsync`**; pass large inputs
+as URLs and avoid embedding large binary results in JSON. See the
+[operation limits](https://docs.runpod.io/serverless/endpoints/operation-reference)
+when checking a deployment's requirements. Runtime storage/auth choices
 must match the target; inspect [Serverless storage](https://docs.runpod.io/serverless/storage/overview).
 Make retry-sensitive writes idempotent when the workload has side effects; treat
 cancellation/interruption as possible partial completion, not guaranteed rollback.

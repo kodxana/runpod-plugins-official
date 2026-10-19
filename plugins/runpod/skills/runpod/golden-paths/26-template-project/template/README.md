@@ -13,7 +13,8 @@ A small real CPU operation: count whitespace-separated, case-folded words. HTTP
 
 File map: `workload.py` is the operation; `app.py` is the HTTP adapter; `handler.py`
 is the queue adapter; `requirements.txt` pins the worker SDK; `test_app.py` checks
-useful results and failure recovery; `test_input.json` is a local SDK request fixture.
+useful results and failure recovery; `check_http.py` waits for readiness and checks
+the running HTTP entrypoint; `test_input.json` is a local SDK request fixture.
 `Dockerfile.http` serves Pods or load balancing;
 `Dockerfile.queue` starts the queue worker. `.dockerignore` excludes local/secret data.
 The separate `pytorch/` directory is a long-lived Pod fixture with its own context:
@@ -60,12 +61,15 @@ as a platform worker. No file-input flag is needed. Do not substitute Bash conti
 in PowerShell. On Linux the Python executable
 may be `python3`; the Docker commands run the image's selected interpreter.
 
-Deployment settings: HTTP port `8080`/`PORT=8080`, default image command, no persistent
-storage, no GPU or CUDA, no application secrets. The HTTP app has **no authentication**;
+Deployment settings: local/Pod HTTP port `8080`; for load-balanced Serverless the app
+uses Runpod's `PORT=80` default, with `/ping` on that same listener. Keep the default
+image command. No persistent storage, GPU, CUDA, or application secrets are needed.
+The HTTP app has **no authentication**;
 the local command binds only loopback. Configure appropriate access for public Pods;
 verify current endpoint authentication for Serverless. Queue mode needs no exposed HTTP
-port. For load balancing, verify current health-port settings and route `/ping` to the
-same listener. Choose CPU sizing/disk from measurements; no live minimum is asserted.
+port. For load balancing, `PORT_HEALTH` defaults to `PORT`; see the
+[load-balanced variant](../variant-load-balanced.md). Choose CPU sizing/disk from
+measurements; no live minimum is asserted.
 
 Image release: resolve/record the Ubuntu base digest, source revision and resulting
 image digest. `runpod==1.10.1` is this fixture's explicit SDK choice, not a latest-version
@@ -77,7 +81,7 @@ provision just to run local tests.
 The app stores no data, so restart needs no migration. Deploy updates as identified
 images/releases and retain the prior image/configuration for rollback. `/ping` is
 immediate only because this app has no initialization dependency. A model app must
-delay readiness until it can execute work.
+return 204 during loading and 200 only when it can execute work.
 
 Verification: local/container checks can be run above; **Runpod end-to-end behavior,
 platform sizing and GPU behavior are unverified here**. If Docker is unavailable,

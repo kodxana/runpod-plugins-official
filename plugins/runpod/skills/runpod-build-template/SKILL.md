@@ -4,11 +4,12 @@ description: >-
   Create or improve a complete Runpod template project from an application request,
   local code, or GitHub repository, with a documented Dockerfile and app-specific
   files for Pods or queue/load-balanced Serverless. Use runpod-templates for finding
-  or operating existing official templates, flash for its code-first workflow,
+  or operating existing official templates, runpod-mcp/runpodctl to register an
+  already-built image as a template, flash for its code-first workflow,
   and companion-clis for standalone image build/push commands.
 metadata:
   author: runpod
-  version: "1.7.1" # x-release-please-version
+  version: "1.7.4" # x-release-please-version
   concepts: [container-image, template, pod, serverless-endpoint, serverless-handler, endpoint-build, hub-repo, model-store, network-volume]
 license: Apache-2.0
 ---
@@ -22,6 +23,8 @@ particular builder. Preserve the user's project conventions and requested behavi
 For a multi-step task, first match the [worked examples](../runpod/golden-paths/README.md),
 especially [project authoring](../runpod/golden-paths/26-template-project/README.md).
 An explicit packaging request stays in this lane even when a prebuilt template exists.
+Registering an already-built image as a Runpod template uses the infrastructure lanes
+through the [router](../runpod/SKILL.md), without authoring another Dockerfile.
 
 ## Choose the contract, then author
 

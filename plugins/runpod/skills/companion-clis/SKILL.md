@@ -1,7 +1,6 @@
 ---
 name: companion-clis
 description: Companion CLIs for Runpod workflows — HuggingFace, GitHub, Docker, and AWS. Use runpod-build-template for complete template project authoring, and the ComfyUI model-repair guide in runpod-templates for imported workflows lacking model download metadata.
-allowed-tools: Bash(hf:*), Bash(gh:*), Bash(docker:*), Bash(aws:*), Bash(ssh-keygen:*), Bash(ssh-add:*), Bash(ssh-agent:*)
 compatibility: Linux, macOS, Windows
 metadata:
   author: runpod

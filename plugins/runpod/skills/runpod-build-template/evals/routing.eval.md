@@ -6,6 +6,8 @@ Evaluate separately: (a) “Turn this ComfyUI repository into my own documented 
 template project.” (b) “Run official ComfyUI on a Pod.” (c) “My existing template takes
 minutes copying its venv into /workspace; optimize these source files.” (d) “Build and
 push this existing Dockerfile.” (e) “Use Flash to deploy my decorated Python function.”
+(f) “Make a Runpod template from my image, ghcr.io/example/my-app:v1; it listens on
+port 3000. Don't deploy it yet.”
 
 ## Expected behavior
 
@@ -20,3 +22,5 @@ replacing it. Improve mode preserves a baseline and names an optimization object
 - (a) does not default to a dual-mode image or a queue handler.
 - (b)/(d)/(e) do not unnecessarily enter a full template-authoring process.
 - Files-only requests do not demand Runpod auth or publish/provision resources.
+- (f) routes to infrastructure template registration via the capability matrix, with
+  image/port settings and a read-back; it creates no Dockerfile, image build, or Pod.
